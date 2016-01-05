@@ -4,7 +4,7 @@ title: About
 ---
 
 
-![image](cbesaw.github.io/assets/eln.jpg "an image title")
+![image](https://cbesaw.github.io/assets/eln.jpg "an image title")
 
 In the novel, *The Strange Case of Dr. Jeykll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
 
