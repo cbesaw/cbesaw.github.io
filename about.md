@@ -6,7 +6,8 @@ title: About
 
 ![image](https://cbesaw.github.io/assets/eln.jpg "an image title")
 
-In the novel, *The Strange Case of Dr. Jeykll and Mr. Hyde*, Mr. Poole is Dr. Jekyll's virtuous and loyal butler. Similarly, Poole is an upstanding and effective butler that helps you build Jekyll themes. It's made by [@mdo](https://twitter.com/mdo).
+Hello! My name is Clayton Besaw. I am currently a PhD student and research assistant at the University of Central Florida.
+I am currently working towards my doctoral degree in Security Studies and a graduate certificate in Data Mining and Statistics.
 
 There are currently two themes built on Poole:
 
