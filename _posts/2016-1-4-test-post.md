@@ -8,7 +8,7 @@ layout: post
 ****
 
 
-Load the *LedarnBayes*[^1] and *Lattice* packages.
+Load the *LearnBayes*[^1] and *Lattice* packages.
 
 
 {% highlight r %}
