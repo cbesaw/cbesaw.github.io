@@ -11,6 +11,9 @@ I am currently working towards my doctoral degree in [Security Studies](http://p
 
 ## Motivation for this Blog
 
-Often times life in the academy becomes the narrow pursuit of our idiosyncratic research interests. The goal of this blog is not only to highlight these academic projects, but also to examine a multitude of topics concerning human behavior and societial processes through the lens of quantitative methodology. 
+The title **Through the data, darkly** refers to the biblical phrase βλέπομεν γὰρ ἄρτι δι' ἐσόπτρου ἐν αἰνίγματι (1 Corinthians 13:12), commonly translated as "For now we see through a glass, darkly." The phrase itself is somewhat ambiguous, but it is clear that it speaks to the imperfect knowledge of humans. As both social scientists and quants, this imperfection comes in two-steps. First, without data, our ability to make judgements on social and natural phenomena is quite limited to anecdotally imformed opinion. Second, even with data, we must be careful in our inferences. Limitations on human cognition, measurement error, and imperfect data all combine to dampen our ability to fully understand the world around us. Like the prophets in ancient tales, scientists must contend with the non-trivial ambiguities that often underlie our findings.        
 
-Thanks for reading!
+The goal of this blog is to examine issues concerning quantitative social science, while also presenting unique research on a variety of topics. This helps to make my own, and others, work more accessible, while also inviting outside opinions and insights. 
+
+
+If you have read this far, thanks for stopping by! Feel free to send me a message at claybesaw@gmail.com. 
