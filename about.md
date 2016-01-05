@@ -7,24 +7,10 @@ title: About
 ![image](https://cbesaw.github.io/assets/eln.jpg "an image title")
 
 Hello! My name is Clayton Besaw. I am currently a PhD student and research assistant at the University of Central Florida.
-I am currently working towards my doctoral degree in Security Studies and a graduate certificate in Data Mining and Statistics.
+I am currently working towards my doctoral degree in [Security Studies](http://politicalscience.cos.ucf.edu/) and a graduate certificate in [Data Mining and Statistics](http://dms.stat.ucf.edu/). I also serve as a program assitant for UCF's [Intelligence Community Center for Academic Excellences (ICCAE)](http://politicalscience.cos.ucf.edu/iccae/). My research interests broadly deal with Political Violence, Behavior, Beliefs, Psychology, Machine Learning, Data Mining, Natural Language Analysis, Bayesian Approaches to Statistics, and applied Econometrics. 
 
-There are currently two themes built on Poole:
+## Motivation for this Blog
 
-* [Hyde](http://hyde.getpoole.com)
-* [Lanyon](http://lanyon.getpoole.com)
-
-Learn more and contribute on [GitHub](https://github.com/poole).
-
-## Setup
-
-Some fun facts about the setup of this project include:
-
-* Built for [Jekyll](http://jekyllrb.com)
-* Developed on GitHub and hosted for free on [GitHub Pages](https://pages.github.com)
-* Coded with [Sublime Text 2](http://sublimetext.com), an amazing code editor
-* Designed and developed while listening to music like [Blood Bros Trilogy](https://soundcloud.com/maddecent/sets/blood-bros-series)
-
-Have questions or suggestions? Feel free to [open an issue on GitHub](https://github.com/poole/issues/new) or [ask me on Twitter](https://twitter.com/mdo).
+Often times life in the academy becomes the narrow pursuit of our idiosyncratic research interests. The goal of this blog is not only to highlight these academic projects, but also to examine a multitude of topics concerning human behavior and societial processes through the lens of quantitative methodology. 
 
 Thanks for reading!
