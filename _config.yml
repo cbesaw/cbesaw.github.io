@@ -6,7 +6,7 @@ relative_permalinks: true
 
 # Setup
 title:               Through the data, darkly
-tagline:             'Exploring humans and society through data'
+tagline:             
 description:         'Clayton Besaw is a PhD student in the Political Science department at the Univeristy of Central Florida. This site details his research and thoughts concerning politics, data-science, and everything in-between.'
 url:                 cbesaw.github.io
 baseurl:             ''
