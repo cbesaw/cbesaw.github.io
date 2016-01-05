@@ -1,0 +1,9 @@
+---
+layout: default
+---
+
+<div class="teaching">
+  <h1 class="teaching-title">{{ page.title }}</h1>
+  <span class="teaching-date">{{ page.date | date_to_string }}</span>
+  {{ content }}
+</div>
