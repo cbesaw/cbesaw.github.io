@@ -1,6 +1,7 @@
 ---
 title: Intro to Bayesian methods
 layout: post
+comments: True
 
 
 ---
