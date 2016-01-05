@@ -6,6 +6,8 @@ comments: True
 
 ---
 
+This post is really only a test for Rmarkdown integration into Jekyll. Substantively, it is a first lab lesson for applied Bayesian estimation in R. 
+
 ****
 
 
