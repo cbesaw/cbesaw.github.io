@@ -18,4 +18,4 @@ The goal of this blog is to examine issues concerning quantitative social scienc
 
 If you have read this far, thanks for stopping by! Feel free to send me a message at claybesaw@gmail.com. 
 
-[^1]: I additionally take great inspiration from Philip K Dick's *A Scanner Darkly*. His dystopian novel concerning the issue of darkside of drug culture illustrates the behavioral and psychological failings of ordinary people. As Bob Arctor continues down the hole of "Substance D", so does his ability to separate fact from fantasy. 
+[^1]:I additionally take great inspiration from Philip K Dick's *A Scanner Darkly*. His dystopian novel concerning the issue of darkside of drug culture illustrates the behavioral and psychological failings of ordinary people. As Bob Arctor continues down the hole of "Substance D", so does his ability to separate fact from fantasy. 
