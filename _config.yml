@@ -15,7 +15,7 @@ paginate:            5
 # About/contact
 author:
   name:'Clayton Besaw'
-  email 'claybesaw[at]gmail[dot]com'
+  email: 'claybesaw[at]gmail[dot]com'
   github: cbesaw
   twitter: Clayton Besaw
   google_scholar: https://scholar.google.com/citations?user=LOouXxgAAAAJ
