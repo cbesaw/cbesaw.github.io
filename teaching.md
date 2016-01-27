@@ -5,4 +5,4 @@ title: Teaching
 
 ## Online Labs and Lectures
 
-[Intro to R Workshop](http://cbesaw.github.io/r-workshop/)
+[Intro to R Workshop](http://cbesaw.github.io/r-workshop/home.html)
