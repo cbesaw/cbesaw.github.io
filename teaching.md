@@ -3,6 +3,6 @@ layout: page
 title: Teaching
 ---
 
-## Online Labs and Lectures
+##Labs and Lectures
 
-[Intro to R Workshop](http://cbesaw.github.io/r-workshop/home.html)
+[Security Studies Intro to R Workshop (Spring 2016)](http://cbesaw.github.io/r-workshop/home.html)
