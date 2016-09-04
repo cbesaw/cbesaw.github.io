@@ -426,6 +426,12 @@ degrees"),lty=c(1,1),lwd=c(4,5), col=c(rgb(0,0,0,1/2),rgb(0,0,0,1/5)))
 
 As expected, the plot above shows that women without degrees have higher predicted probabilities to have two or more children. In turn, women with a degree have relatively higher predicted probabilities for having a single child or no child, when compared to women without a degree.  
 
+<div>
+    <a href="https://plot.ly/~sleepydsdgs/0/" target="_blank" title="" style="display: block; text-align: center;"><img src="https://plot.ly/~sleepydsdgs/0.png" alt="" style="max-width: 100%;width: 600px;"  width="600" onerror="this.onerror=null;this.src='https://plot.ly/404.png';" /></a>
+    <script data-plotly="sleepydsdgs:0"  src="https://plot.ly/embed.js" async></script>
+</div>
+
+
 
 [^1]:LearnBayes is a package created by Jim Albert at Bowling Green University. Documentation can be found at http://cran.r-project.org/web/packages/LearnBayes/LearnBayes.pdf. 
 
