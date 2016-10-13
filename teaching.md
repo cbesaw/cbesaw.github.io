@@ -3,7 +3,7 @@ layout: page
 title: Teaching
 ---
 
-## Courses Taught
+## Courses 
 
 [Security Studies Intro to R Workshop (University of Central Florida, Spring 2016)](http://cbesaw.github.io/r-workshop/home.html)
 
