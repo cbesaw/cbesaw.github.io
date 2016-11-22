@@ -26,7 +26,9 @@ author:
   twitter: Clayton Besaw
   linkedin: clayton besaw
   
-  
+#SEO tag
+gems:
+  - jekyll-seo-tag
 
 # Custom vars
 version: 1.0
