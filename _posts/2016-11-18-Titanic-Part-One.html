@@ -90,7 +90,7 @@ aggr_plot &lt;- aggr(comb_df2, col=c('navyblue','red'), numbers=TRUE, sortVars=T
 ##     Embarked 0.0000000000
 ##      Pclass2 0.0000000000</code></pre>
 <p>The histogram and resulting table indicate that roughly 20% of age values are missing, and that a very small percent (0.0007) of the fare values are missing.<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a> Logistic regression can handle missing values through listwise deletion, but this is not a sound strategy if we have the tools to impute missing values. Methods like Random Forests can’t work with missing values anyways, so we should really find a nice imputation solution. Let’s assume that these values are missing at random and are of an adequately low percentage of full data-frame representation.<a href="#fn2" class="footnoteRef" id="fnref2"><sup>2</sup></a></p>
-<p>Since fare is only missing one, it is easily enough to impute using some central tendency measure. The mean is 33.29, while the median is 14.45. Inpecting the fare variable shows a number of problems.</p>
+<p>Since fare is only missing one, it is easily enough to impute using some central tendency measure. The mean is 33.29, while the median is 14.45. Inspecting the fare variable shows a number of problems.</p>
 <pre class="r"><code>summary(comb_df$Fare)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
 ##   0.000   7.896  14.450  33.300  31.280 512.300       1</code></pre>
@@ -111,6 +111,7 @@ summary(comb_df$fare2) #inspect to see no more zero value, and now 18 NAs</code>
 fareimp &lt;- rpart(fare2 ~ Pclass, data=comb_df[!is.na(comb_df$fare2),], 
                 method=&quot;anova&quot;)
 
+
 comb_df$fare2[is.na(comb_df$fare2)] &lt;- predict(fareimp, comb_df[is.na(comb_df$fare2),])
 
 summary(comb_df$fare2) #inspect to see no more NAs</code></pre>
@@ -121,37 +122,79 @@ summary(comb_df$fare2) #inspect to see no more NAs</code></pre>
                 data=comb_df[!is.na(comb_df$Age),], 
                 method=&quot;anova&quot;)
 
-comb_df$age2[is.na(comb_df$age2)] &lt;- predict(ageimp, comb_df[is.na(comb_df$age2),])</code></pre>
-<pre><code>## Warning in is.na(comb_df$age2): is.na() applied to non-(list or vector) of
-## type 'NULL'
+comb_df$age2 &lt;- NA
 
-## Warning in is.na(comb_df$age2): is.na() applied to non-(list or vector) of
-## type 'NULL'</code></pre>
-<pre class="r"><code>summary(comb_df$age2) #inspect to make sure.</code></pre>
-<pre><code>## Length  Class   Mode 
-##      0   NULL   NULL</code></pre>
+comb_df$age2[is.na(comb_df$age2)] &lt;- predict(ageimp, comb_df[is.na(comb_df$age2),])
+
+summary(comb_df$age2) #inspect to make sure.</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    9.60   27.43   27.43   29.63   32.10   40.55</code></pre>
 <p>Finally in terms of data extraction, let’s look at titles housed in the name variable. People more clever than I noticed that titles were consistent throughout the names listed in the passenger data. Historically, titles were also associated with different personal characteristics such as gender, class, nobility, etc.</p>
-<pre class="r"><code>boxplot(Fare ~ Pclass, data = train, xlab = &quot;Passenger Class&quot;, ylab = &quot;Fare Price&quot;, main = &quot;Relationship between Fare and Class&quot;)</code></pre>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAAgVBMVEUAAAAAADoAAGYAOjoAOmYAOpAAZmYAZpAAZrY6AAA6OgA6Ojo6ZmY6kJA6kLY6kNtmAABmAGZmOgBmZjpmZmZmtttmtv+QOgCQZgCQtpCQ29uQ2/+2ZgC2kDq225C2/7a2/9u2///bkDrbtmbb/9vb////tmb/25D//7b//9v////Si1uQAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3daYPixhqYUexkkpls42zjJCaLSczY/f9/YNjRUtDo7ZJKVX3Ol+vmQjUq4BltqDdvAIRsSj8BgFoJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAloIT+/bfq+P7//378d7vPLH8/vtP8+4c4v2x+f3pe/Qs/oancc4+uUX/rOfGR3WpyebBMYtn02a9vzs/z1z/tNeV93XiCghYwC+k5fXvhsHIZsJaD3RVlMXQHtvX1+XG8V0MUJaCGJgCYidffuZ+Of3++rsZUHtLsoi6kqoNv0P70CujgBLSQV0GfRePezse0MUHlAt+/MxSwqCujpH5jUP70CujgBLeQU0Pt7/bxK0d2fNTApoHk9COgklQR0ZfF5ENBt55/bXfef3jUuQ+MEtJBBQC8fih8P7y+gM1tjfNIB3XdXOi9rzud/ete4DI0T0EKGAd2/sw0voDNbY3ySAe0W8+i8M+j77f9a2TI0TkALGQa08zE4uuyRu1dk8NnY9fea7jv7w36MP0iXnWadPQT7y4PPv6dbx+vO2fudrwE9j3L7PHd+ye7ye3cPV6OvAd2P7zFY1N6ibO/37i7T6Tl29/sNezu68fHyPpjg0ZPvDrc7/7Tr3Jh8Gs/GePKMzi/BjwcBHU3h9jbA8zdJZ+zB3qLkjbxCQAt5GtDOAY3kAdbd5u70kKcB7Ryvut12/vjef8/38X1vH6dLQLeD+44Cuh8+sOMc0Nvvuy/4aFF7i3KtzFu/G/dyJWYqeeOj5X3rPygV0NFkX3//9jbf6afxfIyHz+h2069/JgO6HU7x/pbT52+St/TLm76R1whoIc824XtH6BMHWLsfjfNjngV0fO/rA/7dt+Ht/XMDLp+mc0D/W+83vI0D+l/udxh36HSPf/Xb6B7jRe0tyul3nGfgvBinmpxWhU8jpGYqeeOD5e14FNDU9J1u+7f3SUo+jXfGePSMuv/c/ZvbIg+e54O9Ic/fJA9e3uSNvEhACxkE9Lx5fP55cELN+bPS+WwMzoA6vuWfBHS/6fuevPX8wRmeHzNeJzw5J2IY0Kcfwwf3SCxqb1Huqbw8tfuW6vG/Hs/Uu8sweoYPApqY7NHKXfI3vjfGg2c0PkXpa2qw9K6C52+S9Mubfs15kYAW0g/o5V18fvPeD8h3Ds13Phu3bbjzB/cyyIPzQDv75s4f2fPNl4/v8YfLR+3H9dbOZ6133+FvHAf0+MODfYG74RjneyQXtbso172r10edft/+OlfJhydvTC9v1+g80O/35zJc9E5Ajzekl+IuOcaDZ7S73Xot26Boib3I/WV4/CZJvrzp15wXCWghqRPpR2HqHLy+3zpazRhVZ/RBuozW2frrngpz/0ju7sMdP029ddjzfTu/cRTQ8z3OH8PhCl76HulF7S7K6fd1V0xvmfrx4OHpMdPL25UOaHqyd720PViK/sijMdLPqDd7201itNcCmvydyZc3/ZrzIgEtJBHQbq+6n83Tx6n7KT280btbq88Cer5H7wj3fb2juzPzdJ/OfsaO7n3PH/BhW3pH37tVv9l1FvD+NNKL2l2U0+873npd6fvauS358PSY6eXterAGmpzs7j8HD5eiIzVG+hn1Ju/8Q2wNNPU7ky9v+jXnRQJayDig1/dwt4T3fYDJXXTvB/S+gXYb7r45f/+obYbHorp5Sd93FNDrb+nc5W7XLc7taacXtXfz7nzr6f/9t+cxbmulyYenx3ywDKO5HAc0Ndn907UeLEXKMKDpV6A/k8GAJn5n8uVNv+a8SEALGQT0/ikZH0W47wMcfDY659E8CmgvXJ0TC7sf1PvHt/e7b9ntfajvv2YY0NtvSZ0H39u0vf7CB4vaG+A0T99Pv+yX//7t9AuvG53Jhz8YM728Xe+dhN6d7N769KOleGeM9DNKzOQHA9r5ncmXN/2a8yIBLeR+EOl+2OAk8Xk8frIenCN9/zA9Cej9I3j78UEU+1nv7lO4fqgfB/T2W1If+8Q9kgH93v8dtyPux+fw6//5/bS028tTTz78wZgPlrfjhRPpb5OdWOMeL8U7Y6SfUT+gqT2qLx6FT/7O5MubvJEXCWghnaPw+85b/KWADs6ACQd0HMXBb+88v1IBveRyd3r48b/PZ+N/fTRTzwKaWN67RwFNTXYvcy8ENDVG+hm9H9DxeaA/v/3o/n/P3iSplzd9I68R0EK6pzHtxm/nZ+d5X78S9OWv9/eBPt2ETwel+8m7n9r+fkDf34TvJ+f7o0XtD3D67f/1fIXQ439/+b/X/zf58AdjhgOanOzk0jyWHCP9jPrXHUj9UzQ+y2F3e8i7b5K3xMv78EZeIKCF9M4D7V3MLn0pjcFxoe5JnlMPIt32CT4OyvXjdz+C/X5A3z+IdL1H8iDS8Ldfbz7d+fgdpsOvOu0J/c/9SAwfnh4zGtD0ZL//D8b7YzwJ6NODSKMLDnSK+u6bpPuMBxlO38g7BLSQXkAvR4DPH5XBSuNb5y6n+3c+rx88jSkRlJ/fRucavRrQ3sk3wxKl75Fe1EGROh/s28Zm59udw4enx4wGND3ZiQ3tJ+tt6THSz6hXu+RpTJe73DPXOQ/p3TdJ6uVN38hrBLSQfma6u0G7Rwn24yZ2V/C6WQqcSD/8+PZ2r52expQ10N53EZNZG90jvagPdil8fbsfFul+tXvw8PSYwYA+mOx+Mh8sxTtjpJ9RdwO99/W00Vz2zkIdfgcj+TuTL++D15wXCWghySvSnz8U9y+gdL6tMvhsdL442A3o+Mojl2Osya9ypg9hdH7fpH2gvaf34Kucwy97Jhe1tyj3EzQ7ZzL2d30MHp688UMBHU12as/yaCneGePBM7q/SNflfnhF+s4XV4cXTEj/zuTLm37NeZGAFjIIaLcqw3PsB1+cHF2Xo7uisbmvSvaOUA1Ge7oBObzzywG9G30IH9wjuai9RbnFoLNHIn3dpU1vDf61ZehIb8KnJ3sQ0PRSvDPGo2e0Hd479DeRkr8z+fKmX3NeJKCFpC9n1zuvqftxG+3WPPsX1y/ldD7Fg4A+uZzd+OM7SMH3Z/cdBvRf/qfb48a70YYXvOtda3T45LqL8tZbRxqu3yYfnroxGtD0ZA/3eiafxjtjPHpG3Xv/u/vL2zeobO8rXk/eJMmXN3kjLxLQQoYB7V6urff2H18r9/6O/9H96vX1Q/V1GIOHF1R+7zzQH0/vOzqN6f9dH/vogsqpSy4nFrW3KG/9YynDQ9DJhyduDJ/GlJzs0WGj5NN4PsbDZ3R/Cb7/fBTQ9/8ufPpNknp50zfyGgEtZHSsurOz8u32iRxs4/eOlp7uOvrW43332bjOwz/pkQ7KpV73h79+HmjyAPzb7R4/Bl+CfLCovUV56558NTwt69HDxzfGT6RPTXbiuHvyaTwb48kzuh3YeRzQe/a6k/HCm2T88j68kRcIKB/33ok80CgB5eMElE9KQPk4AeWTElA+TkD5pASUjxNQPikB5eMElE9KQPk4AeWTElA+TkD5pAQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIGjdAd0AZJM/UdlHzKj0bANtyd6o3APmNMM/GMCnJaAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKEFRfQLe3rwB8nf5gAQXyqSygu8HXqKY2VECBfKoK6M9voy+i/vrnpBEEFMinpoD+83u/mH//dvj5y19ThhBQIJ+aArof5fKY1B9ThhBQIJ+aArodb7AfVkIn7QZtLqBzXVMLeEFFAT2sbn4f3bibtg3fWmnmuyoh8L6KAnpY2xxvru+nHUZqLDS3cCoolCCgFetks60Fg0pUFFCb8EPdpWlryaAOFQXUQaQhAYWyagpo+jSm8VrpE21lRkChrJoCmjyRftpXkdrKjIBCWTUF9FzMvl/+mDRCW5kRUCirqoB2L8XkYiICCqVVFtA3l7PrcBoTlFVfQD+ksc44kR6KEtCq+SonlFRfQG3Cd+knFFRZQF2RHliPqgLqivTAmtQUUFekB1alpoC6Ij2wKjUF1MVEgFWpKKAuZwesS0UBnX5B5dEhJ+f7ABkJKEBQRQG1CQ+sS0UBdRAJWJeaAuqK9MCq1BRQV6QHVqWmgLoiPbAqVQXUFemBNaksoG8uZwesRn0B/RABBfIRUICgSgN6Ppw07VJ2RwIK5FNRQA/RvBZz6yASUF6VAe0ci5+4EiqgQD41BnS/uXz/6LghP20dVECBfCoM6OF/b18/2k08k15AgXwqDOi+8/33f353MRGglAoD2lvrdDk7oJgKA7rtBvTpBZXHBBTIp8qAdpopoEAxFQZ0Zw0UWIUKA7rv/i34rX2gQCkVBrR75H3vivRAMXUFdHM6hf5WzeMl6l2RHiilvoCenLJ5+kbn+C8dPyOgQD4VBfSt09BTQHeT+ymgQEZ1BfTs57fr4fjJ16QXUCCfGgP6AQIK5COgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABB9QV0u7n6Ov3BAgrkU1lAd5u+qQ0VUCCfqgL689tm6Nc/J40goEA+NQX0n9/7xfz7t8PPX/6aMoSAAvnUFND9KJfHpP6YMoSAAvnUFNDteIP9sBI6aTeogAL5VBTQw+rm99GNu2nb8AIK5FNRQA9rm+PN9f20w0gCCuQjoABBFQXUJjywLhUF1EEkYF1qCmj6NKbxWukTAgrkU1NAkyfST/sqkoAC+dQU0HMx+375Y9IIAgrkU1VAu5dicjERoLTKAvrmcnbAatQX0A8RUCAfAQUIqi+gNuGBlagsoK5ID6xHVQF1RXpgTWoKqCvSA6tSU0BdkR5YlZoC6mIiwKpUFFCXswPWpaKATr+g8uiQ00ZAgXwEFCCoooDahAfWpaKAOogErEtNAXVFemBVagqoK9IDq1JTQF2RHliVqgLqivTAmlQW0DeXswNWo76AfoiAAvkIKEBQvQH9+7dpZzCdCCiQj4ACBAkoQFBFAU2cBTr5j3oIKJCPgAIEVRTQ43fhBRRYj5oCeloHvV1OxD5QoLCqAnr6GtL12+8CChRWWUBPfxr+3E0BBQqrLaCna9qdNuMFFCisuoAe/4rH6Y/BCyhQWIUBPW3GfxVQoLQaA3rajP/1fwsoUFaVAT1vxk/8c0gnAgrkU2lAT5vxAgoUVWtAT6eECihQUr0BDRFQIB8BBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUICg+gK63Vx9nf5gAQXyWSygf/+22fzyx9vuy18fGXy36ZvaUAEF8lkooMd8ngO62fwID/3z22bo1z+nPTkBBbJZJqDnfh4DetwAjxb0n9/7xTyNOm2NVkCBfBYJ6LF8X/76+e0Q0GNBJ6413uxHuTwOPCnHAgrks0hAD+X7ftwAPwb0uBH/PTbydpzew0ropN2gAgrks0hAt6c1x0tAD2uNsQNJhweOy7ubNpiAAvksEdBL+S4BPTQvtg1/WNscb67vpw0moEA+SwT0Ur5rQCc2bzhMn4ACxVQUUJvwwLoU2ITfBveBOogErMtCB5GO5bsEdGrz7tKnMU06pC+gQD5Lncb09RrQyadu3iVPpJ+2O0BAgXyW+SbS6ez5U0B3k7881HH5QlPXea/A609OQIFsFv0qZ+jr6z3bQT9dTAQoZ6GLiZy2vj/ezyOXswNWYrHL2V0S+tF8fpCAAvnUd0HlDxFQIJ/6AmoTHliJpQK6O5+79PdvH9uGd0V6YD2WOwp/CujxmvLB0+jfXJEeWJfFLqh8/sbQPrjpfR/GFemBtVgkoLvOCe+7+N/0cEV6YFUWuphIZ73xsB0eXAV1MRFgVRa6nF33ih8Tr0B343J2wLoseD3Qq+UuqDw65LQRUCAfAQUIWmgfaHc7O3pBZZvwwLosdRT+nr69P2sMtGGRgB5P2Lycx3T8z+iXkVyRHliVZb6JtO/thgyeBuqK9MC6LPRd+M6XMCdeQ77LFemBNVnsakyX+H0gn0euSA+sh8vZAQTVF9APEVAgHwEFCJo3oOfrgI6O/WT4w0jnP7E0+YRSAQXyqSyg+8sVQPfBkQQUyKeqgF7+sucvf9zPinJFeqCYqvaBXg/Af/mfl3JuXZEeKKemgB7WO4/ZPP1huUs3965IDxSzSEC3GY4avR3LeR5nez8f/7BR72IiQCEFLmcXdbuc3WFN9Daey9kBxSx0QeX4nzLuDXPeXO+udk68OrOAAvlUtAZ6vyL9VkCBFVhkH+jUQz1p979Nt+1uwgsoUMgyR+G7ey3DkiuyWweRgFIW2gea5UT63XhFdurfBxFQIJ+aAnoc5+vwBlekB0qpKaDnb8DfV0K3/R9fenICCmRT0zeRTgXtXNJ+N7mfAgpkVFdA+19q2k0/vVRAgXxqC+gHCSiQz/wBPV96bvKlj+choEA+cwf0cgnPD/85zkwEFMhn7oDe/4bmKgoqoEA+Mwd0f/nrw8czmXJ8H/6jBBTIZ+aAbjf3KyitYRVUQIF85g1o5+vrie9hFiCgQD6z/1G566maP7+t4Ui8gAL5LBbQTFdV/qDmAno9RFf6ecCnJKBVu19foPQzgc9IQGt2C6eCQgkCWrFONttaMKiEgFasuzRtLRnUQUArJqBQloBWTEChrNkDmhK9In2GJ9dUZgQUyhLQigkolCWgFRNQKMsV6SvmNCYoS0Br5kR6KEpAq+arnFCSgNZNP6EgAQUIElCAIAEFCBLQutkHCgUJaNUchYeSBLRmzgOFogS0Yr6JBGUJaMV8Fx7KEtCKCSiUtVhAjxdm+uWPt92Xv3L/winayoyAQlkLBfR8XbtjQDebH7l/4wRtZUZAoaxlAnq5LughoNtN0YK2lRkBhbIWCeg/v282X/76+e0Q0GNBy11PubHMCCiUtUhA95vN97e3c0CPG/Hfc//Ol7WVGacxQVmLBHS7OR46ugT0sDpa7kBSY51xIj0UtURAD8k8rnNeAnpYBfU3kXLxVU4oaYmA/v3b6bjRNaB7Ac1HP6EgAQUIKrAJv7UPFGjCQgeRjuucl4Ae1ke/5v6dLxNQIJ+lTmP6eg3o8ZzQcmfSCyiQzzLfRDqdPX8K6G6zKbgFL6BARot+lfOs4BeRBBTIaKGLiRw33FfQTwEFMlrscnaXhBbNp4ACObmgct2cSA8FLXMaU+H1zrvWSuOrnFDSQifSl70O/V1joXExEShqoa9yljt1vq+tzricHZRlDbRiLqgMZS31TaSSfwipo63MCCiUtcxR+J/fVrIO2lZmDktzO4bU1pJBHRbaB9rncnZ59Ge19LOBz0dAK3bPpoBCCQJasd5R+KaWDOrgm0gVE1Aoq76Abm8rsoGTS9vKjE14KKuygO4GOwOmNrStzDiIBGWVCOjf/zG4D/Tnt83QxN2pbWXGaUxQ1kIB3ec4iHS6Il7nsaeDU9POL20rM06kh7IW+5MeGQK6H+Vy8h9YaiszAgplLRLQ4aZ38Hud23F5p16npK3M9I7Cl3wi8Ekt9GeNj5nbnVq3Dffz8ufl+3bTtuEb64xjSFDUgldj2p9XIHfRLfjD2uY4vftpo7XWGf2Ekhb6JtJx1fH8d+GPOY2tggroiDVQKGqhgP64/89lU346m/BD9oFCWQsG9BrAn9+Cl7ZzEGnAUXgoa8GAHgJ4it3Pb1lPYxqvlT57ck1lRkChrIUOIp0qd9ncnrjbsjfO+ET6aWO1lRkBhbIWOY3pcuB9vzkdRZq427JjdF28zXnECU+uqcwIKJS11In0x9Cd/7DHPnQZpYvBV5o+/cVE0v8NLGO5r3J+v+fvQ39hzuXsbgQUylomoJfvrF82wQv+kfi2MuM0JihrqcvZ7c87Ky+rosU01plbQZ1IDyVUdkHlN5vwPb6IBCVVFlBXpB/QTyho3oBO/aLQO1yRHliTmgLqivTAqiwV0MPK44cPHrkiPbAqNQXUxUSAVakooC5nB6xLRQGdfkHl0SEnh6uBjAQUIKiigNqEB9alooA6iASsS00BdUV6YFVqCqgr0gOrUlNAXZEeWJWqAuqK9MCazB7QlOAflTtzOTtgJeoL6MeenIAC2QgoQFBlF1T+KAEF8qksoKdLKndOBv3n92mrswIK5FNXQK8HkG6HjwQUKKeqgN4PwF9XQgUUKKemgB6334/XY9rdCyqgQDk1BXR7/d7R8Tud54IKKFBORQE9xPK273N7KaiAAuVUFNDeBZUvBRVQoJxaA3os6FcBBUqqNqDnS4EKKFBORQHt7gN9u/xNeAEFyqkooMfTl7p/Ve7nt80v/0NAgWJqCujxPNDuRUX3069MIqBAPjUF9HQGfXczfi+gQEFVBfRU0O466HGdVECBQuoK6Phvw+8EFCilsoB+lIAC+QgoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECWhZm7UoPRFQIwEtqnQ270rPBNRIQKvX4jJBHQS0ei0uE9RBQKvX4jJBHQS0ei0uE9RBQKvX4jJBHQS0ei0uE9RBQKvX4jJBHQS0ei0uE9RBQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBLR6LS4T1EFAq9fiMkEdBLR6LS4T1EFAq9fiMkEdBLR6LS4T1EFAq9fiMkEdBLR6LS4T1EFAq9fiMkEdBLR6LS4T1EFAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEtHotLhPUQUCr1+IyQR0EtHotLhPUQUCr1+IyQR0EtHotLhPUQUCr1+IyQR0EtHotLhPUQUCr1+IyQR0EtHotLhPUQUABggQUIEhAAYIEFCBIQAGC6gvodnP1dfqDBRTIp7KA7jZ9UxsqoEA+VQX057fN0K9/ThqhxYC2uExQh5oC+s/v/WL+/dvh5y9/TRmixdi0uExQh5oCuh/l8pjUH1OGaDE2LS4T1KGmgG7HG+yHldBJu0FbjE2LywR1qCigh9XN76Mbd9O24VuMTYvLBHWoKKCHtc3x5vp+2mGkFmPT4jJBHQS0ei0uE9ShooDahE9rcZmgDhUF1EGktBaXCepQU0DTpzGN10qfEBsgn5oCmjyRftpXkQQUyKemgJ6L2ffLH5NGEFAgn6oC2r0Uk4uJAKVVFtA3l7MDVqO+gH6IgAL5CChAUH0BtQk/0OIyQR0qC6gr0o+1uExQh6oC6or0KS0uE9ShpoC6In1Si8sEdagpoK5In9TiMkEdagqoi4kktbhMUIeKAupydmktLhPUoaKATr+g8uiQ06bF2LS4TFAHAa1ei8sEdagooDbhgXWpKKAOIgHrUlNAXZEeWJWaAuqK9MCq1BRQV6QHVqWqgK7rivSpY/yfWr6phUpUFtC39VzOrmCp1irb3EIl6gvoh2QNaLah2mBC+HwEdAVDtcGE8PkI6AqGaoMJ4fMR0BUM1QYTwucjoCsYqg0mhM9HQFcwVBtMCJ+PgK5gqDaYED6figKa+B7S0aTvcgrofEwIn4+ARunFgAnh86kooKm/aiyg62FC+HxqCuhpHXTS1etGBHQ+JoTPp6qAHgs68fJLAwI6HxPC51NXQI9b8ZP+hMeQgM7HhPD5VBbQt90m8ZflXieg8zEhfD61BfSwEf+RVVABnU87E+LyfLyqtoB+cBVUQOfTzIS4wCkvqy6gHyOg82llQm7hVFDeJaArGKoNjUxIJ5uNLBEzEtAVDNWGRiakuxiNLNIqNLpbREBXMFQbGpkQAZ1FqzuWBXQFQ7WhkQkR0Dk0u2NZQFcwVBsamRABnUG7O5YFdAVDtaGRCRHQGbQ7qQK6gqHa0MiEHBbjtreukUUqT0AnjJh7wJwEdD6NTEjvWomln0wrBHTCiLkHzElA59PKhDR7vKMgAZ0wYu4BcxLQ+TQyIdZAZyCgE0bMPWBOAjqfRibEPtAZCOiEEXMPmJOAzqeRCWn3s16Q05gmjJh7wJwEdD6NTIiAzqHZHcsCuoKh2tDIhAjoLFrdryygKxiqDY1MiIDOo81+CugHhmIg29yWJKDzaOpNcieg8aEYyDa3JXWWo5ElWoXG3iU3AhofioFsc1vUptXjHSU1O6kCGh+KgWxzW1ZzCwP1tfkAAA2+SURBVFTeptnVegGND8VAtrktrLXlKa/dHcsCGh+KgWxzS2MEdMKIuQfMyWlM8zEhPCKgE0bMPWBOAjofE8IjAjphxNwD5iSg8zEhPCKgE0bMPWBOAjofE8IjAjphxNwD5iSg8zEhPNI5wtjY20RAVzBUG0wIDzV7soaArmCoNpgQHmu0nwK6hqHaYEJ4yBro6yPmHjAnAZ2PCeER+0AnjJh7wJwEdD4mhEcchZ8wYu4BcxLQ+ZgQHhHQCSPmHjAnAZ2PCeERAZ0wYu4BcxLQ+ZgQHhHQCSPmHjAnAZ2PCeGRw3vjdgy+rfeJgK5gqDaYEB5p97KHArqCodpgQnjkns3G+imgaxiqDSaERwR0woi5B8xJQOezognJeZn9jyg9D6vR7rQI6AqGasN6JqRMLRNKT8RqOIg0YcTcA+YkoPNpakKaWpjy2v13RUBXMFQbmpqQphamvHs2BfTdEXMPmJOAzqepCWlqYcrrVFNA3xsx94A5Ceh8mpqQphamPPtAJ4yYe8CcBHQ+TU1IUwtTnn2gE0bMPWBOAjqfpiakqYUpT0AnjJh7wJwEdD5NTUhTC1OegE4YMfeAOQnofJqakKYWpjwBnTBi7gFzEtD5mBAeEdAJI+YeMKesAWUg29zSmPu7o7X3iYDGh2Ig29zSmPu7o7X3iYBWr8Vloi3t/kMroNVrcZloixPpJ4yYe8Cc2nrxoA6d1U5roO+NmHvAnNp68aAO9oFOGDH3gDm19eI1aJmjXRUp/YLclZ6Jq9Lz0CegrEjpD+cKlX5JrkrPw03piegTUFbE6zPQyISsuIAfJKCsiNdnoJUJEdDXR8w9YE6NvXrN8foMNDMhjfZTQOvX0jK1tCxZtDMhbfZTQOvX0jK1tCxZNDUhTS3MhYBWr6VlamlZsmhqQppamAsBrV5Ly9TSsmTR1IQ0tTAXAlq9lpappWXJoqkJaWphLgS0ei0tU0vLkoUJWTkBrV5LyzTzl1hqZFpnkGNSr1Obb6zLiLkHzKml2Fy1tEylP1grZFbnkGFWr3ObbajriLkHzKml2Fy1tEylP1crlGVWMwzSEgGN8lZat9K1WqEss5phkJYIaJS30rqVrtUKZZnVDIO0RECjvJVWrnSuVifPpOYYpSECGuWtxOdT+h+BFco4t9mGuo6Ye8CcBJTPp3StVijj3GYb6jpi7gFzElA+n9K1WqGMc5ttqOuIuQfMSUD5fErXaoUyzm22oa4j5h5wYHubhK/TH9xiQFtcpuKamtSCoVqrjHObbajriLkH7NoN5mFqQ5v6XFy0uEzFtTWpRRq1ZjmnNt9YlxFzD3j389toJn79c9IIbX0uzlpcpuJM6gxanNSaAvrP7/1i/v3b4ecvf00ZwkvIS0zqDFqc1JoCuh/l8pjUH1OG8BLyEpM6gxYntaaAbscb7IeV0Em7Qb2EvMSkzqDFSa0ooIfVze+jG3fTtuG9hLzEpM6gxUmtKKCHtc3x5vr+2WGkeY+/ZTHz0cbXlZ6IrEpP5lXpeciq9GRelZ6HPgEtauk332OlZyKn0nN5U3oicio9lzelJ6KvooDahAfWpaKAOogErEtNAU2fxjReK31CQIF8agpo8kT6aV9FElAgn5oCei5m3y9/TBpBQIF8qgpo91JMZy4mApRTWUDfXM4OWI36AvohAgrkI6AAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQZ8uoAD5ZG9U7gFzKj3ZQFuyNyr3gDxnt8QMTOoMTOorTNLCvC1nYFJnYFJfYZIW5m05A5M6A5P6CpO0MG/LGZjUGZjUV5ikhXlbzsCkzsCkvsIkLczbcgYmdQYm9RUmaWHeljMwqTMwqa8wSQvztpyBSZ2BSX2FSVqYt+UMTOoMTOorTNLCvC1nYFJnYFJfYZIW5m05A5M6A5P6CpO0MG/LGZjUGZjUV5ikhXlbzsCkzsCkvsIkLczbcgYmdQYm9RUmaWHeljMwqTMwqa8wSQvztpyBSZ2BSX2FSVqYt+UMTOoMTOorTNLCvC1nYFJnYFJfYZIW5m05A5M6A5P6CpMEECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoEv7+7df/yz9HJry89vm4Jc/Sj+Pppwn9Xvpp7F+Arqwf37fCGhGf/+2uTCt2RzepBc/Sj+VtRPQhW190nO699O8ZnPvp4K+R0AXdXpr+qDns7tuaB7+Ydp8Lf1sGnGd1OO/Tl/+Kv1s1k1Al3TesySg2Rw/4pd1pJ2JzeTwr/xlj/Jheu1bfk5Al3Pa3PzX9oFmtL+vdh5X7m1v5nD4Z/46qTtz+g4BXc5xy+iHg0g57TpHirc+7NmZ0/cI6HJ2x3/YBXQuW5ubuR22mbxZnxPQhQnoTA4fdgc88to5Cv8uAV2YgM5k57zvrLbOYnqFgC5MQOfx85sV0KwE9CUCujABncWhn6Y1p+vJ9P5Vek5AFyagc9g7CXQOxxPvfDvhKQFdmIDOQD9n4kz69wjowgQ0v60tzbk4NPcOAV2YgOZ23FtnO3MmewF9TkAXJqCZHa8v4DM+FwF9h4AuTEDzOvTTXrq8fD92AgFdmIBm5ShHfp1Twpwd9h4BXZiA5uQSTDM4Tur5PXq72iqPCOjCBDSn/aZHS7M4X7b2zOG55wR0YQKaUfdvTwhoPvc/lKKf7xDQhQloRt2/iCSgOZ1XQp1d+y4BBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABJa/dpuN76WfzwM9vp6f39frzP79vfv2z5BOiUgJKXr2ArjOhnad4SaiAEiOg5DUI6OZH6Sc0dIhlx5e/LrcJKAECSl67TjP3h0KtLUynfv7yx/E///7tug4qoMQIKHl1A3ra17iyVdBtd7/C/rKKLKDECCh59QJ6zNXXx/ct4Jj0zn7Z3XkjXkCJEVDy6gd0dwvo9rTL8bztfLTvHwcf/Xy54TLWuXC7+17Lo9Mm+K9/Hv7nelvvMYdf+eWvfe+Xnp7GfYDTEMf/txPQyc+Tz0xAySsd0PuhpXO+LucR3Tanhz/fbziH7Vi4/3W96cdt7JN//9tw0EsMDwH9v/0anvaAJvYp3AI6+XnyuQkoeY024b+/9Q/NH38+rTt2cjj8uROqc9l6h87PQdx3bjnVbviYwy//F98Gq4uH+6S21a8Bnfw8+eQElLxSB5GO3TmtsR3/4xi7XaeLqZ+P/3vK5P7Sv3NAf5zHv7Xt+Jj9NaCjx5y2xrvb6+f/b3DLySWgk58nn52Aklc3oNeC7W9rgZc1wO31TpdyDX++d+6+k/K66njZK7DrbmVffkn/McP9nUfPAzr5efLZCSh5DU6k7x7AeTu17Rie3aBjw5+398ftTyuFx4De944e77vt7gs93zB4zHX/Qdc+ffxn1MMXnyefnYCS1+5JP08b4rft7sEZ952fO8fVj738enrkdahzQC+F690weEynsTfP10CnPk8+PQElr106n/dDPqdSbbuHakY/d4/VnPcCpAJ6LeH5P8eP6a6TXl1WX4fuAZ30PPn0BJS8dqkVtM4B8tH5Qt/fRj937/4goJ0SngM6fkwqoNfdowPXgE58nnx6AkpeqYBe1w5PJ71ft5Vvq4zfRz+P1xPfXwNNrFsmAjo6D/S8U7RzFH7K8+TTE1DySgV0dzuE3gnT5cfeTsnLz4N7vb24D3R4XDwR0MThqssxqssxo0nP8/Es8EkIKHklAtqp3/6UqM4xm1OpEj8PBhkFtHOX3WZww1UqoIPvwp+fz+UJTX6er84JzRJQ8noa0OvZ79vuBvHhhuHP91XB+2lM/YDeVyWHJ72/dU5jSuzv3HU3vveXH4YBffV58tkJKHmlNuG3m843JY+Nun1Z6Fiqr+OfT5vIPy4PvZxIPwjotXGn4z7XG3qPSQf0/p2mzob4/Tz5ac+Tz05AySsV0O7X1m9fEuod7R7+3H3EZRVxENDxd+GHj0kHdHC+0/1aJX9GniefnICSV/I0plt3/sPvtysYdzs1+nl42aNEQJ9cjemynZ0OaK+Cg7+JNP158rkJKHklA3pp2/fOdykvK4K3+w5/vvTxXrhRQK/XA71872j0mIcBvbV3/Fc5A8+Tz0xAqV0noLAsAaVO9y+6J64ZAssQUOp0PdR+/w9YnIBSp+7X1q2AUoiAUqm9flKcgFKtbf9QOixOQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGC/j8kFPtENxBs6wAAAABJRU5ErkJggg==" width="672" /></p>
-<pre class="r"><code>train$lfare &lt;- log(train$Fare + 1)
-test$lfare &lt;- log(test$Fare + 1)
-train$iage &lt;- with(train, impute(Age, mean))
-test$iage &lt;- with(test, impute(Age, mean))
-test$ifare &lt;- with(test, impute(Fare, mean))
-test$lifare &lt;- log(test$ifare + 1) 
-train$lifare &lt;- train$lfare
-train$south &lt;- ifelse(train$Embarked == &quot;S&quot;, 1, 0)
-train$south &lt;- as.factor(train$south)
-test$south &lt;- ifelse(test$Embarked == &quot;S&quot;, 1, 0)
-test$south &lt;- as.factor(test$south)
-train$priority &lt;- 0
-train$priority[which(train$Sex==&quot;female&quot; | train$iage &lt; 16)] &lt;- 1
-test$priority &lt;- 0
-test$priority[which(test$Sex==&quot;female&quot; | test$iage &lt; 16)] &lt;- 1
-train$child &lt;- 0
-train$child[which(train$iage &lt; 16)] &lt;- 1
-test$child &lt;- 0
-test$child[which(test$iage &lt; 16)] &lt;- 1</code></pre>
+<pre class="r"><code>comb_df$Name &lt;- as.character(comb_df$Name)
+
+strsplit(comb_df$Name[2], split='[,.]') #want to isolate the &quot;title&quot; string segment</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;Cumings&quot;                               
+## [2] &quot; Mrs&quot;                                  
+## [3] &quot; John Bradley (Florence Briggs Thayer)&quot;</code></pre>
+<pre class="r"><code>comb_df$Title &lt;- sapply(comb_df$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][2]})
+comb_df$Title &lt;- sub(' ', '', comb_df$Title)
+comb_df$Title[comb_df$Title %in% c('Mme', 'Mlle')] &lt;- 'Mlle'
+comb_df$Title[comb_df$Title %in% c('Capt', 'Don', 'Major', 'Sir')] &lt;- 'Sir'
+comb_df$Title[comb_df$Title %in% c('Dona', 'Lady', 'the Countess', 'Jonkheer')] &lt;- 'Lady'
+comb_df$Title &lt;- factor(comb_df$Title)
+table(comb_df$Title)</code></pre>
+<pre><code>## 
+##    Col     Dr   Lady Master   Miss   Mlle     Mr    Mrs     Ms    Rev 
+##      4      8      4     61    260      3    757    197      2      8 
+##    Sir 
+##      5</code></pre>
+<p>Next, we can create a couple of family related variables. These are family size and family id or cluster:</p>
+<pre class="r"><code>#family size.
+comb_df$FamilySize &lt;- comb_df$SibSp + comb_df$Parch + 1 #add one to account for the passenger as well.
+
+#combine surname and family size into a factor 
+comb_df$Surname &lt;- sapply(comb_df$Name, FUN=function(x) {strsplit(x, split='[,.]')[[1]][1]})
+comb_df$FamilyID &lt;- paste(as.character(comb_df$FamilySize), comb_df$Surname, sep=&quot;&quot;)
+comb_df$FamilyID[comb_df$FamilySize &lt;= 2] &lt;- 'Small'
+famIDs &lt;- data.frame(table(comb_df$FamilyID))
+famIDs &lt;- famIDs[famIDs$Freq &lt;= 2,]
+comb_df$FamilyID[comb_df$FamilyID %in% famIDs$Var1] &lt;- 'Small'
+comb_df$FamilyID &lt;- factor(comb_df$FamilyID)
+table(comb_df$FamilyID)</code></pre>
+<pre><code>## 
+##        11Sage       3Abbott       3Boulos       3Bourke        3Brown 
+##            11             3             3             3             4 
+##     3Caldwell      3Collyer      3Compton       3Coutts       3Crosby 
+##             3             3             3             3             3 
+##       3Danbom       3Davies        3Dodge         3Drew        3Elias 
+##             3             5             3             3             3 
+##    3Goldsmith         3Hart      3Hickman      3Johnson       3Klasen 
+##             3             3             3             3             3 
+##       3Mallet        3McCoy     3Moubarek        3Nakid     3Navratil 
+##             3             3             3             3             3 
+##      3Peacock        3Peter        3Quick      3Rosblom       3Samaan 
+##             3             3             3             3             3 
+##    3Sandstrom      3Spedden      3Taussig       3Thayer        3Touma 
+##             3             3             3             3             3 
+## 3van Billiard     3Van Impe        3Wells         3Wick      3Widener 
+##             3             3             3             3             3 
+##      4Allison      4Baclini       4Becker       4Carter         4Dean 
+##             4             4             4             4             4 
+##       4Herman     4Johnston      4Laroche         4West         5Ford 
+##             4             4             4             4             5 
+##      5Lefebre      5Palsson      5Ryerson      6Fortune       6Panula 
+##             5             5             5             6             6 
+##         6Rice        6Skoog    7Andersson      7Asplund      8Goodwin 
+##             6             6             9             7             8 
+##         Small 
+##          1074</code></pre>
+<p>Finally, let’s make a women and children first variable. This is based on the common anecdotal story of life boats only accepting women and children before adult males.</p>
+<pre class="r"><code>comb_df$priority &lt;- 0
+comb_df$priority[which(comb_df$Sex==&quot;female&quot; | comb_df$age2 &lt; 16)] &lt;- 1</code></pre>
+<p>We have done a lot of work here! Let’s run some models. First resplit the combined data set back into training and test sets.</p>
+<pre class="r"><code>train &lt;- comb_df[1:891,]
+test &lt;- comb_df[892:1309,]</code></pre>
 </div>
 <div id="logistic-regression" class="section level2">
 <h2>Logistic Regression</h2>
@@ -176,7 +219,166 @@ test$child[which(test$iage &lt; 16)] &lt;- 1</code></pre>
 <p>Finally, one can find the maximum likelihood estimates for a specific parameter by taking the partial derivative of the log likelihood function. Say we wanted the estimate <span class="math inline">\(\beta_{j}\)</span> from the set of estimates <span class="math inline">\(\beta\)</span>. We take the partial derviative of the log likelihood function with respect to <span class="math inline">\(\beta_{j}\)</span></p>
 <p><span class="math display">\[ \frac{\partial \ell}{\partial \beta_{j}} = -\sum_{i=1}^{n} \frac{1}{1 + e^{\beta_{0} + \beta x_{i}}} e^{\beta_{0} + \beta x_{i}}x_{ij} + \sum_{i=1}^{n} y_{i}x_{ij} \]</span></p>
 <p><span class="math display">\[ = \sum_{i=1}^{n}(y_{i} - p(x_{i};\beta_{0},\beta))x_{ij} \]</span></p>
-<p>From here, we have the basis for estimating <span class="math inline">\(\beta_{j}\)</span>. The result is an approximation, as the resulting equation is transcendental.</p>
+<p>From here, we have the basis for estimating <span class="math inline">\(\beta_{j}\)</span>. The resulting beta values are estimates because the partial derivative function is transcendental.</p>
+<div id="logistic-regression-using-glm" class="section level3">
+<h3>Logistic Regression using GLM</h3>
+<p>So let’s put the above into action. Logitistic regression models are easy to implement in R using the glm() function. Here I use the logit link.</p>
+<pre class="r"><code>lfit &lt;- glm(Survived2 ~ Pclass2 + SibSp + fare2 + Embarked + priority + age2 + Parch + Title, 
+            data = train, family = binomial(logit))
+
+
+summary(lfit)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived2 ~ Pclass2 + SibSp + fare2 + Embarked + 
+##     priority + age2 + Parch + Title, family = binomial(logit), 
+##     data = train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.4405  -0.6336  -0.3982   0.5188   2.4633  
+## 
+## Coefficients:
+##                Estimate  Std. Error z value    Pr(&gt;|z|)    
+## (Intercept)    1.114166    1.749083   0.637     0.52412    
+## Pclass22      -1.086626    0.403463  -2.693     0.00708 ** 
+## Pclass23      -2.181913    0.444036  -4.914 0.000000893 ***
+## SibSp         -0.438038    0.143767  -3.047     0.00231 ** 
+## fare2          0.002477    0.002457   1.008     0.31342    
+## EmbarkedQ     -0.108594    0.395787  -0.274     0.78380    
+## EmbarkedS     -0.456701    0.245963  -1.857     0.06334 .  
+## priority      -2.171446    0.979025  -2.218     0.02656 *  
+## age2          -0.023742    0.024821  -0.957     0.33880    
+## Parch         -0.360929    0.136907  -2.636     0.00838 ** 
+## TitleDr        0.467218    1.652747   0.283     0.77741    
+## TitleLady      2.478722    2.116785   1.171     0.24160    
+## TitleMaster    4.471005    1.645752   2.717     0.00659 ** 
+## TitleMiss      4.874589    1.739323   2.803     0.00507 ** 
+## TitleMlle     17.430855  840.228654   0.021     0.98345    
+## TitleMr       -0.338500    1.440880  -0.235     0.81427    
+## TitleMrs       5.381037    1.756308   3.064     0.00219 ** 
+## TitleMs       18.896646 1455.398594   0.013     0.98964    
+## TitleRev     -14.406445  591.633321  -0.024     0.98057    
+## TitleSir      -0.156936    1.700415  -0.092     0.92647    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  729.89  on 871  degrees of freedom
+## AIC: 769.89
+## 
+## Number of Fisher Scoring iterations: 14</code></pre>
+<pre class="r"><code>dev = 1186.6 - 630.75
+dfree &lt;- 890 - 812
+sig &lt;- 1 - pchisq(dev, df=dfree)
+sig</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>#significant model at the 0% level
+
+
+
+anova(lfit, test=&quot;Chisq&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model: binomial, link: logit
+## 
+## Response: Survived2
+## 
+## Terms added sequentially (first to last)
+## 
+## 
+##          Df Deviance Resid. Df Resid. Dev              Pr(&gt;Chi)    
+## NULL                       890    1186.66                          
+## Pclass2   2  103.547       888    1083.11 &lt; 0.00000000000000022 ***
+## SibSp     1    0.040       887    1083.07             0.8417158    
+## fare2     1    7.479       886    1075.59             0.0062416 ** 
+## Embarked  2   16.721       884    1058.87             0.0002339 ***
+## priority  1  238.582       883     820.29 &lt; 0.00000000000000022 ***
+## age2      1    3.652       882     816.63             0.0559969 .  
+## Parch     1    0.941       881     815.69             0.3320660    
+## Title    10   85.802       871     729.89   0.00000000000003626 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<pre class="r"><code>vif(lfit)</code></pre>
+<pre><code>##               GVIF Df GVIF^(1/(2*Df))
+## Pclass2   4.533083  2        1.459145
+## SibSp     2.085296  1        1.444055
+## fare2     1.640160  1        1.280687
+## Embarked  1.309050  2        1.069644
+## priority 27.055227  1        5.201464
+## age2      4.978660  1        2.231291
+## Parch     1.521050  1        1.233309
+## Title    46.902284 10        1.212159</code></pre>
+<pre class="r"><code>test$Survived &lt;- predict(lfit, newdata = test, type=&quot;response&quot;)
+test$Survived[test$Survived &gt; .5]=&quot;Yes&quot;
+test$Survived[test$Survived &lt;= .5]=&quot;No&quot;
+vars &lt;- c(&quot;PassengerId&quot;, &quot;Survived&quot;)
+sub &lt;- test[vars]
+sub$Survived[sub$Survived==&quot;Yes&quot;]=1
+sub$Survived[sub$Survived==&quot;No&quot;]=0
+sub$Survived &lt;- as.factor(sub$Survived)
+write.csv(sub, &quot;besaw_sub.csv&quot;)</code></pre>
+<p>Score of 0.79426, not bad…Let’s try some interaction effects.</p>
+<pre class="r"><code>lfit &lt;- glm(Survived2 ~ Pclass2 + SibSp + fare2 + Embarked + priority + age2 + Parch + Title + priority*Pclass2 +
+              SibSp*priority + Pclass2*SibSp + Pclass2*Parch, 
+            data = train, family = binomial(logit))
+
+
+summary(lfit)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Survived2 ~ Pclass2 + SibSp + fare2 + Embarked + 
+##     priority + age2 + Parch + Title + priority * Pclass2 + SibSp * 
+##     priority + Pclass2 * SibSp + Pclass2 * Parch, family = binomial(logit), 
+##     data = train)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.0165  -0.5355  -0.4199   0.3414   2.3268  
+## 
+## Coefficients:
+##                      Estimate  Std. Error z value Pr(&gt;|z|)   
+## (Intercept)          0.679764    1.914146   0.355  0.72249   
+## Pclass22            -1.604792    0.547557  -2.931  0.00338 **
+## Pclass23            -1.345472    0.536659  -2.507  0.01217 * 
+## SibSp                0.305911    0.357008   0.857  0.39151   
+## fare2                0.001726    0.002698   0.640  0.52227   
+## EmbarkedQ           -0.155566    0.381959  -0.407  0.68380   
+## EmbarkedS           -0.535461    0.250159  -2.140  0.03232 * 
+## priority            -0.140686    1.170246  -0.120  0.90431   
+## age2                -0.011483    0.031468  -0.365  0.71519   
+## Parch               -0.744546    0.418493  -1.779  0.07522 . 
+## TitleDr             -0.097666    1.689988  -0.058  0.95392   
+## TitleLady            0.816524    2.033841   0.401  0.68808   
+## TitleMaster          4.284450    1.700119   2.520  0.01173 * 
+## TitleMiss            4.415994    1.798349   2.456  0.01407 * 
+## TitleMlle           15.384437  840.259572   0.018  0.98539   
+## TitleMr             -0.600261    1.449138  -0.414  0.67871   
+## TitleMrs             4.603745    1.813619   2.538  0.01114 * 
+## TitleMs             17.652788 1455.398737   0.012  0.99032   
+## TitleRev           -13.915157  589.976359  -0.024  0.98118   
+## TitleSir            -0.362893    1.712217  -0.212  0.83215   
+## Pclass22:priority   -0.139366    0.974519  -0.143  0.88628   
+## Pclass23:priority   -2.485059    0.842521  -2.950  0.00318 **
+## SibSp:priority      -0.321285    0.382498  -0.840  0.40093   
+## Pclass22:SibSp      -0.559350    0.606727  -0.922  0.35657   
+## Pclass23:SibSp      -0.469754    0.476165  -0.987  0.32387   
+## Pclass22:Parch       1.193951    0.607597   1.965  0.04941 * 
+## Pclass23:Parch       0.424308    0.443516   0.957  0.33872   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1186.66  on 890  degrees of freedom
+## Residual deviance:  691.46  on 864  degrees of freedom
+## AIC: 745.46
+## 
+## Number of Fisher Scoring iterations: 14</code></pre>
+<p>Deviance change seemed promising, but a score of 0.78, not an improvement…</p>
+</div>
 </div>
 <div class="footnotes">
 <hr />
@@ -212,3 +414,4 @@ $(document).ready(function () {
 
 </body>
 </html>
+
